@@ -1,36 +1,90 @@
-// CBSE 10th Board Prep - App Logic
+// CBSE 10th Maths Prep - App Logic
 
 // State
-let currentMode = null; // 'mixed' or subject name
+let currentMode = null; // 'random' or chapter id
+let selectedChapter = null;
 let currentQuestions = [];
 let currentIndex = 0;
 let answeredQuestions = new Set();
-const QUESTIONS_PER_SESSION = 10;
+let questionCount = 10;
+
+// Chapter names
+const CHAPTERS = [
+    { id: 1, name: "Real Numbers" },
+    { id: 2, name: "Polynomials" },
+    { id: 3, name: "Pair of Linear Equations in Two Variables" },
+    { id: 4, name: "Quadratic Equations" },
+    { id: 5, name: "Arithmetic Progressions" },
+    { id: 6, name: "Triangles" },
+    { id: 7, name: "Coordinate Geometry" },
+    { id: 8, name: "Introduction to Trigonometry" },
+    { id: 9, name: "Some Applications of Trigonometry" },
+    { id: 10, name: "Circles" },
+    { id: 11, name: "Areas Related to Circles" },
+    { id: 12, name: "Surface Areas and Volumes" },
+    { id: 13, name: "Statistics" },
+    { id: 14, name: "Probability" }
+];
 
 // --- Initialization ---
 function init() {
-    updateQuestionCounts();
     document.getElementById('total-questions').textContent = QUESTION_BANK.length;
+    document.getElementById('total-chapters').textContent = CHAPTERS.length;
+    buildChapterGrid();
 }
 
-function updateQuestionCounts() {
-    const subjects = ['mathematics', 'science', 'social_science', 'english', 'hindi'];
-    subjects.forEach(subject => {
-        const count = QUESTION_BANK.filter(q => q.subject === subject).length;
-        const el = document.getElementById('count-' + subject);
-        if (el) el.textContent = count + ' questions';
+function buildChapterGrid() {
+    const grid = document.getElementById('chapter-grid');
+    grid.innerHTML = '';
+    CHAPTERS.forEach(ch => {
+        const count = QUESTION_BANK.filter(q => q.chapter_id === ch.id).length;
+        const card = document.createElement('div');
+        card.className = 'chapter-card';
+        card.onclick = () => selectChapter(ch.id);
+        card.innerHTML = `
+            <span class="chapter-num">${ch.id}</span>
+            <div class="chapter-info">
+                <h4>${ch.name}</h4>
+                <span class="q-count">${count} questions</span>
+            </div>
+        `;
+        grid.appendChild(card);
     });
 }
 
 // --- Navigation ---
-function showSubjectPicker() {
+function showChapterPicker() {
     document.querySelector('.mode-selection').classList.add('hidden');
-    document.getElementById('subject-picker').classList.remove('hidden');
+    document.getElementById('chapter-picker').classList.remove('hidden');
+    document.getElementById('count-selector').classList.add('hidden');
+    document.getElementById('stats-bar').classList.add('hidden');
 }
 
-function hideSubjectPicker() {
+function hideChapterPicker() {
     document.querySelector('.mode-selection').classList.remove('hidden');
-    document.getElementById('subject-picker').classList.add('hidden');
+    document.getElementById('chapter-picker').classList.add('hidden');
+    document.getElementById('stats-bar').classList.remove('hidden');
+}
+
+function showCountSelector(title) {
+    document.querySelector('.mode-selection').classList.add('hidden');
+    document.getElementById('chapter-picker').classList.add('hidden');
+    document.getElementById('count-selector').classList.remove('hidden');
+    document.getElementById('count-selector-title').textContent = title;
+    document.getElementById('stats-bar').classList.add('hidden');
+}
+
+function hideCountSelector() {
+    if (selectedChapter) {
+        // Go back to chapter picker
+        document.getElementById('count-selector').classList.add('hidden');
+        document.getElementById('chapter-picker').classList.remove('hidden');
+    } else {
+        // Go back to mode selection
+        document.getElementById('count-selector').classList.add('hidden');
+        document.querySelector('.mode-selection').classList.remove('hidden');
+        document.getElementById('stats-bar').classList.remove('hidden');
+    }
 }
 
 function goHome() {
@@ -38,28 +92,57 @@ function goHome() {
     document.getElementById('quiz-screen').classList.add('hidden');
     document.getElementById('results-screen').classList.add('hidden');
     document.querySelector('.mode-selection').classList.remove('hidden');
-    document.getElementById('subject-picker').classList.add('hidden');
+    document.getElementById('chapter-picker').classList.add('hidden');
+    document.getElementById('count-selector').classList.add('hidden');
+    document.getElementById('stats-bar').classList.remove('hidden');
     currentQuestions = [];
     currentIndex = 0;
     answeredQuestions.clear();
+    selectedChapter = null;
+    currentMode = null;
+}
+
+// --- Mode Selection ---
+function startRandomMode() {
+    currentMode = 'random';
+    selectedChapter = null;
+    const available = QUESTION_BANK.length;
+    showCountSelector(`Random Mix \u2014 ${available} questions available. How many?`);
+}
+
+function selectChapter(chapterId) {
+    selectedChapter = chapterId;
+    currentMode = chapterId;
+    const chapterName = CHAPTERS.find(c => c.id === chapterId).name;
+    const available = QUESTION_BANK.filter(q => q.chapter_id === chapterId).length;
+    showCountSelector(`Ch ${chapterId}: ${chapterName} \u2014 ${available} questions available. How many?`);
+}
+
+function startWithCount(count) {
+    let pool;
+    let modeLabel;
+
+    if (currentMode === 'random') {
+        pool = [...QUESTION_BANK];
+        modeLabel = 'Random Mix';
+    } else {
+        pool = QUESTION_BANK.filter(q => q.chapter_id === selectedChapter);
+        const ch = CHAPTERS.find(c => c.id === selectedChapter);
+        modeLabel = `Ch ${ch.id}: ${ch.name}`;
+    }
+
+    const shuffled = shuffleArray(pool);
+
+    if (count === 0 || count >= shuffled.length) {
+        currentQuestions = shuffled;
+    } else {
+        currentQuestions = shuffled.slice(0, count);
+    }
+
+    startQuiz(modeLabel);
 }
 
 // --- Start Quiz ---
-function startMixedMode() {
-    currentMode = 'mixed';
-    const shuffled = shuffleArray([...QUESTION_BANK]);
-    currentQuestions = shuffled.slice(0, QUESTIONS_PER_SESSION);
-    startQuiz('Random Mix');
-}
-
-function startSubjectMode(subject) {
-    currentMode = subject;
-    const subjectQuestions = QUESTION_BANK.filter(q => q.subject === subject);
-    const shuffled = shuffleArray([...subjectQuestions]);
-    currentQuestions = shuffled.slice(0, Math.min(QUESTIONS_PER_SESSION, shuffled.length));
-    startQuiz(SUBJECT_NAMES[subject]);
-}
-
 function startQuiz(modeLabel) {
     currentIndex = 0;
     answeredQuestions.clear();
@@ -83,13 +166,11 @@ function renderQuestion() {
     document.getElementById('progress-bar').style.width = ((currentIndex + 1) / total * 100) + '%';
 
     // Meta badges
-    const card = document.getElementById('question-card');
-    card.setAttribute('data-subject', q.subject);
-    document.getElementById('q-subject').textContent = SUBJECT_NAMES[q.subject];
+    const chapterName = CHAPTERS.find(c => c.id === q.chapter_id)?.name || 'Chapter ' + q.chapter_id;
+    document.getElementById('q-chapter').textContent = 'Ch ' + q.chapter_id + ': ' + chapterName;
     document.getElementById('q-year').textContent = q.year;
     document.getElementById('q-type').textContent = q.type;
     document.getElementById('q-marks').textContent = q.marks + (q.marks === 1 ? ' Mark' : ' Marks');
-    document.getElementById('q-chapter').textContent = q.chapter;
 
     // Question text
     document.getElementById('question-text').innerHTML = formatText(q.question);
@@ -101,7 +182,6 @@ function renderQuestion() {
         mcqContainer.innerHTML = '';
         const letters = ['A', 'B', 'C', 'D'];
         q.options.forEach((opt, i) => {
-            if (opt.startsWith('__')) return; // skip placeholder options
             const div = document.createElement('div');
             div.className = 'mcq-option';
             div.onclick = () => selectOption(i);
@@ -146,14 +226,16 @@ function selectOption(index) {
     options[index].classList.add('selected');
 
     // If has correct answer, show correct/incorrect
-    if (q.correctOption !== undefined) {
+    if (q.correctOption !== undefined && q.correctOption !== null) {
         answeredQuestions.add(currentIndex);
 
         if (index === q.correctOption) {
             options[index].classList.add('correct');
         } else {
             options[index].classList.add('incorrect');
-            options[q.correctOption].classList.add('correct');
+            if (q.correctOption < options.length) {
+                options[q.correctOption].classList.add('correct');
+            }
         }
 
         // Auto-show answer
@@ -236,25 +318,26 @@ function showResults() {
 }
 
 function restartSameMode() {
-    if (currentMode === 'mixed') {
-        startMixedMode();
+    if (currentMode === 'random') {
+        startWithCount(currentQuestions.length);
     } else {
-        startSubjectMode(currentMode);
+        selectedChapter = currentMode;
+        startWithCount(currentQuestions.length);
     }
 }
 
 // --- Utilities ---
 function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+        [arr[i], arr[j]] = [arr[j], arr[i]];
     }
-    return array;
+    return arr;
 }
 
 function formatText(text) {
     if (!text) return '';
-    // Convert newlines to <br> but preserve paragraph structure
     return text
         .replace(/\n\n/g, '</p><p>')
         .replace(/\n/g, '<br>')

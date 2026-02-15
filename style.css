@@ -20,11 +20,8 @@
     --warning: #f59e0b;
     --warning-light: rgba(245, 158, 11, 0.15);
     --danger: #ef4444;
-    --math-color: #818cf8;
-    --science-color: #34d399;
-    --social-color: #fbbf24;
-    --english-color: #f472b6;
-    --hindi-color: #fb923c;
+    --accent: #818cf8;
+    --accent-light: rgba(129, 140, 248, 0.15);
     --radius: 12px;
     --radius-sm: 8px;
     --shadow: 0 4px 24px rgba(0,0,0,0.3);
@@ -146,58 +143,85 @@ body {
     margin-bottom: 16px;
 }
 
-/* Subject Picker */
-.subject-picker {
+/* Chapter Picker */
+.chapter-picker {
     padding-bottom: 40px;
 }
 
-.subject-picker h3 {
+.chapter-picker h3 {
     text-align: center;
     font-size: 1.3rem;
     margin-bottom: 24px;
 }
 
-.subject-grid {
+.chapter-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 16px;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
     margin-bottom: 20px;
 }
 
-.subject-card {
+.chapter-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 24px 16px;
-    text-align: center;
+    padding: 18px 16px;
     cursor: pointer;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 14px;
 }
 
-.subject-card:hover {
+.chapter-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow);
+    border-color: var(--accent);
+    background: var(--bg-card-hover);
 }
 
-.subject-card.math:hover { border-color: var(--math-color); }
-.subject-card.science:hover { border-color: var(--science-color); }
-.subject-card.social:hover { border-color: var(--social-color); }
-.subject-card.english:hover { border-color: var(--english-color); }
-.subject-card.hindi:hover { border-color: var(--hindi-color); }
-
-.subject-icon {
-    font-size: 2rem;
-    margin-bottom: 8px;
+.chapter-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
 }
 
-.subject-card h4 {
-    font-size: 1rem;
-    margin-bottom: 4px;
+.chapter-info h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+    line-height: 1.3;
 }
 
-.q-count {
+.chapter-info .q-count {
     color: var(--text-muted);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+}
+
+/* Count Selector */
+.count-selector {
+    text-align: center;
+    padding-bottom: 40px;
+}
+
+.count-selector h3 {
+    font-size: 1.3rem;
+    margin-bottom: 24px;
+}
+
+.count-options {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
 /* Stats Bar */
@@ -322,9 +346,9 @@ body {
     letter-spacing: 0.5px;
 }
 
-.badge-subject {
-    background: var(--primary-light);
-    color: var(--primary);
+.badge-chapter {
+    background: var(--accent-light);
+    color: var(--accent);
 }
 
 .badge-year {
@@ -340,11 +364,6 @@ body {
 .badge-marks {
     background: rgba(244, 114, 182, 0.15);
     color: #f472b6;
-}
-
-.badge-chapter {
-    background: rgba(148, 163, 184, 0.15);
-    color: #94a3b8;
 }
 
 /* Question Card */
@@ -590,14 +609,62 @@ body {
     opacity: 0.6;
 }
 
+/* Math/formula styling */
+.formula {
+    font-family: 'Cambria Math', 'Times New Roman', serif;
+    font-style: italic;
+    background: rgba(255,255,255,0.05);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Table styling for questions */
+.question-text table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 0.95rem;
+}
+
+.question-text table th,
+.question-text table td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: center;
+}
+
+.question-text table th {
+    background: rgba(108, 99, 255, 0.1);
+    font-weight: 600;
+}
+
+.answer-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 0.95rem;
+}
+
+.answer-content table th,
+.answer-content table td {
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    padding: 8px 12px;
+    text-align: center;
+}
+
+.answer-content table th {
+    background: rgba(34, 197, 94, 0.1);
+    font-weight: 600;
+}
+
 /* Responsive */
 @media (max-width: 640px) {
     .mode-cards {
         grid-template-columns: 1fr;
     }
 
-    .subject-grid {
-        grid-template-columns: 1fr 1fr;
+    .chapter-grid {
+        grid-template-columns: 1fr;
     }
 
     .stats-bar {
@@ -635,20 +702,8 @@ body {
         font-size: 0.65rem;
         padding: 3px 8px;
     }
-}
 
-/* Math/formula styling */
-.formula {
-    font-family: 'Cambria Math', 'Times New Roman', serif;
-    font-style: italic;
-    background: rgba(255,255,255,0.05);
-    padding: 2px 6px;
-    border-radius: 4px;
+    .count-options {
+        flex-wrap: wrap;
+    }
 }
-
-/* Selection highlight colors per subject */
-[data-subject="mathematics"] .badge-subject { background: rgba(129,140,248,0.15); color: var(--math-color); }
-[data-subject="science"] .badge-subject { background: rgba(52,211,153,0.15); color: var(--science-color); }
-[data-subject="social_science"] .badge-subject { background: rgba(251,191,36,0.15); color: var(--social-color); }
-[data-subject="english"] .badge-subject { background: rgba(244,114,182,0.15); color: var(--english-color); }
-[data-subject="hindi"] .badge-subject { background: rgba(251,146,60,0.15); color: var(--hindi-color); }

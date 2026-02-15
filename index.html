@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CBSE Class 10 Board Prep - Previous Year Questions</title>
+    <title>CBSE Class 10 Maths - Previous Year Questions</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,78 +14,66 @@
         <!-- Header -->
         <header class="header">
             <div class="container">
-                <h1 class="logo">CBSE 10th Board Prep</h1>
-                <p class="tagline">Previous Year Questions (2022-2024)</p>
+                <h1 class="logo">CBSE 10th Maths Prep</h1>
+                <p class="tagline">Previous Year Board Questions (2022-2024) &bull; Chapter-wise</p>
             </div>
         </header>
 
         <!-- Home Screen -->
         <main id="home-screen" class="container">
             <section class="hero">
-                <h2>Practice Makes Perfect</h2>
-                <p>Get randomized previous year questions from CBSE Class 10 board exams. Practice by subject or mix it up across all subjects.</p>
+                <h2>Master Every Chapter</h2>
+                <p>Practice real board exam questions organized by NCERT chapters. Pick a chapter or go random!</p>
             </section>
 
             <section class="mode-selection">
-                <h3>Choose Your Practice Mode</h3>
+                <h3>Choose Your Mode</h3>
                 <div class="mode-cards">
-                    <div class="mode-card" onclick="startMixedMode()">
+                    <div class="mode-card" onclick="startRandomMode()">
                         <div class="mode-icon">&#127922;</div>
                         <h4>Random Mix</h4>
-                        <p>Questions from all subjects shuffled together. Great for surprise practice!</p>
-                        <button class="btn btn-primary">Start Random Mix</button>
+                        <p>Questions from all chapters shuffled together</p>
+                        <button class="btn btn-primary">Start Random</button>
                     </div>
-                    <div class="mode-card" onclick="showSubjectPicker()">
+                    <div class="mode-card" onclick="showChapterPicker()">
                         <div class="mode-icon">&#128218;</div>
-                        <h4>Pick a Subject</h4>
-                        <p>Focus on one subject at a time. Choose from Mathematics, Science, Social Science, English, or Hindi.</p>
-                        <button class="btn btn-secondary">Choose Subject</button>
+                        <h4>Pick a Chapter</h4>
+                        <p>Focus on one NCERT chapter at a time</p>
+                        <button class="btn btn-secondary">Choose Chapter</button>
                     </div>
                 </div>
             </section>
 
-            <!-- Subject Picker (hidden by default) -->
-            <section id="subject-picker" class="subject-picker hidden">
-                <h3>Select a Subject</h3>
-                <div class="subject-grid">
-                    <div class="subject-card math" onclick="startSubjectMode('mathematics')">
-                        <div class="subject-icon">&#128290;</div>
-                        <h4>Mathematics</h4>
-                        <p class="q-count" id="count-mathematics"></p>
-                    </div>
-                    <div class="subject-card science" onclick="startSubjectMode('science')">
-                        <div class="subject-icon">&#128300;</div>
-                        <h4>Science</h4>
-                        <p class="q-count" id="count-science"></p>
-                    </div>
-                    <div class="subject-card social" onclick="startSubjectMode('social_science')">
-                        <div class="subject-icon">&#127758;</div>
-                        <h4>Social Science</h4>
-                        <p class="q-count" id="count-social_science"></p>
-                    </div>
-                    <div class="subject-card english" onclick="startSubjectMode('english')">
-                        <div class="subject-icon">&#128214;</div>
-                        <h4>English</h4>
-                        <p class="q-count" id="count-english"></p>
-                    </div>
-                    <div class="subject-card hindi" onclick="startSubjectMode('hindi')">
-                        <div class="subject-icon">&#128220;</div>
-                        <h4>Hindi</h4>
-                        <p class="q-count" id="count-hindi"></p>
-                    </div>
+            <!-- Chapter Picker -->
+            <section id="chapter-picker" class="chapter-picker hidden">
+                <h3>NCERT Class 10 Maths Chapters</h3>
+                <div class="chapter-grid" id="chapter-grid">
+                    <!-- Filled by JS -->
                 </div>
-                <button class="btn btn-ghost" onclick="hideSubjectPicker()">&#8592; Back</button>
+                <button class="btn btn-ghost" onclick="hideChapterPicker()">&larr; Back</button>
+            </section>
+
+            <!-- Question count selector -->
+            <section id="count-selector" class="count-selector hidden">
+                <h3 id="count-selector-title">How many questions?</h3>
+                <div class="count-options">
+                    <button class="btn btn-secondary" onclick="startWithCount(5)">5</button>
+                    <button class="btn btn-secondary" onclick="startWithCount(10)">10</button>
+                    <button class="btn btn-secondary" onclick="startWithCount(15)">15</button>
+                    <button class="btn btn-primary" onclick="startWithCount(0)">All</button>
+                </div>
+                <button class="btn btn-ghost" onclick="hideCountSelector()">&larr; Back</button>
             </section>
 
             <!-- Stats -->
-            <section class="stats-bar">
+            <section class="stats-bar" id="stats-bar">
                 <div class="stat">
                     <span class="stat-num" id="total-questions">0</span>
                     <span class="stat-label">Total Questions</span>
                 </div>
                 <div class="stat">
-                    <span class="stat-num">5</span>
-                    <span class="stat-label">Subjects</span>
+                    <span class="stat-num" id="total-chapters">0</span>
+                    <span class="stat-label">Chapters</span>
                 </div>
                 <div class="stat">
                     <span class="stat-num">3</span>
@@ -112,21 +100,16 @@
 
             <div id="question-card" class="question-card">
                 <div class="question-meta">
-                    <span id="q-subject" class="badge badge-subject">Mathematics</span>
+                    <span id="q-chapter" class="badge badge-chapter">Chapter</span>
                     <span id="q-year" class="badge badge-year">2024</span>
                     <span id="q-type" class="badge badge-type">MCQ</span>
                     <span id="q-marks" class="badge badge-marks">1 Mark</span>
-                    <span id="q-chapter" class="badge badge-chapter">Chapter</span>
                 </div>
 
-                <div id="question-text" class="question-text">
-                    <!-- Question will be inserted here -->
-                </div>
+                <div id="question-text" class="question-text"></div>
 
                 <!-- MCQ Options -->
-                <div id="mcq-options" class="mcq-options hidden">
-                    <!-- Options inserted here -->
-                </div>
+                <div id="mcq-options" class="mcq-options hidden"></div>
 
                 <!-- Answer Section -->
                 <div id="answer-section" class="answer-section hidden">
@@ -134,27 +117,22 @@
                         <span>&#128161; Show Answer</span>
                         <span id="answer-toggle-icon" class="toggle-icon">&#9660;</span>
                     </div>
-                    <div id="answer-content" class="answer-content hidden">
-                        <!-- Answer inserted here -->
-                    </div>
+                    <div id="answer-content" class="answer-content hidden"></div>
                 </div>
             </div>
 
             <div class="quiz-nav">
-                <button id="prev-btn" class="btn btn-ghost" onclick="prevQuestion()" disabled>&#8592; Previous</button>
+                <button id="prev-btn" class="btn btn-ghost" onclick="prevQuestion()" disabled>&larr; Previous</button>
                 <div class="quiz-nav-center">
                     <button class="btn btn-primary btn-sm" onclick="showAnswer()">Show Answer</button>
                 </div>
-                <button id="next-btn" class="btn btn-primary" onclick="nextQuestion()">Next &#8594;</button>
+                <button id="next-btn" class="btn btn-primary" onclick="nextQuestion()">Next &rarr;</button>
             </div>
 
-            <!-- Question number selector -->
-            <div class="question-dots" id="question-dots">
-                <!-- Dots inserted via JS -->
-            </div>
+            <div class="question-dots" id="question-dots"></div>
         </main>
 
-        <!-- Results / Session Summary -->
+        <!-- Results Screen -->
         <main id="results-screen" class="container hidden">
             <div class="results-card">
                 <h2>&#127881; Session Complete!</h2>
@@ -169,8 +147,8 @@
         <!-- Footer -->
         <footer class="footer">
             <div class="container">
-                <p>Built with &#10084; for CBSE 10th Board aspirants. Good luck with your exams!</p>
-                <p class="footer-note">Questions sourced from CBSE previous year papers (2022-2024).</p>
+                <p>Built with &#10084; for CBSE 10th Board aspirants. All the best!</p>
+                <p class="footer-note">Questions from CBSE board papers (2022-2024). Answers are for guidance only.</p>
             </div>
         </footer>
     </div>
